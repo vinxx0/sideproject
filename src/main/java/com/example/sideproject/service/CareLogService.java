@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -22,7 +21,7 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class CareLogService {
-    
+
     private final CareLogRepository careLogRepository;
     private final PetRepository petRepository;
 
@@ -36,7 +35,7 @@ public class CareLogService {
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 반려동물 입니다"));
 
         List<String> imageUrls = saveImages(careLogDto.getImages());
-    
+
         CareLog careLog = CareLog.builder()
                 .pet(pet)
                 .type(careLogDto.getType())
@@ -45,7 +44,7 @@ public class CareLogService {
                 .memo(careLogDto.getMemo())
                 .imageUrl(String.join(",", imageUrls)) // 여러 장은 콤마로 구분해 저장
                 .build();
-        
+
         careLogRepository.save(careLog);
     }
 
@@ -54,11 +53,35 @@ public class CareLogService {
         return careLogRepository.findByPetId(petId);
     }
 
+    // 돌봄 기록 단건 조회
+    public CareLog getCareLog(Long careLogId) {
+        return careLogRepository.findById(careLogId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 기록입니다"));
+    }
+
+    // 돌봄 기록 수정
+    public void update(Long careLodId, CareLogDto careLogDto) {
+        CareLog careLog = careLogRepository.findById(careLodId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 기록입니다"));
+
+       List<String> imageUrls = saveImages(careLogDto.getImages());
+        careLog.update(careLogDto.getType(), careLogDto.getDate(),
+                       careLogDto.getTime(), careLogDto.getMemo(),
+                       String.join(",", imageUrls));
+        careLogRepository.save(careLog);  
+    }
+
+    // 돌봄 기록 삭제
+    public void delete(Long careLogId) {
+    careLogRepository.deleteById(careLogId);
+    }   
+
+    
     // 여러 장 이미지 저장 + 수량/용량 검증
     private List<String> saveImages(List<MultipartFile> files) {
         List<String> imageUrls = new ArrayList<>();
 
-        if(files == null || files.isEmpty()) {
+        if (files == null || files.isEmpty()) {
             return imageUrls;
         }
 
@@ -67,12 +90,13 @@ public class CareLogService {
         }
 
         for (MultipartFile file : files) {
-            if (file.isEmpty()) continue;
+            if (file.isEmpty())
+                continue;
 
             if (file.getSize() > MAX_FILE_SIZE) {
                 throw new IllegalArgumentException(file.getOriginalFilename() + "파일이 10MB를 초과했습니다");
             }
-            
+
             try {
                 File dir = new File(uploadDir);
                 if (!dir.exists()) {

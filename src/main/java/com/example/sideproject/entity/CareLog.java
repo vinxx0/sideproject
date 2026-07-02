@@ -51,4 +51,12 @@ public class CareLog {
     @CreationTimestamp
     private LocalDateTime createdAt;
 
+    public void update(CareType type, LocalDate date,
+                       LocalTime time, String memo, String imageUrl) {
+        this.type = type;
+        this.date = date;
+        this.time = time;
+        this.memo = memo;
+        this.imageUrl = imageUrl;
+    }
 }
