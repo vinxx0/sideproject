@@ -46,6 +46,26 @@ public class PetService {
         petRepository.save(pet);
     }
 
+    // 반려동물 수정
+    public void update(Long petId, PetDto petDto) {
+        Pet pet = petRepository.findById(petId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 반려동물입니다"));
+
+        String profileImageUrl = petDto.getProfileImage() != null && !petDto.getProfileImage().isEmpty()
+                ? saveProfileImage(petDto.getProfileImage())
+                : pet.getProfileImageUrl();
+        
+        pet.update(petDto.getName(), petDto.getSpecies(), petDto.getGender(),
+                   petDto.getBreed(), petDto.getBirthDate(), profileImageUrl);
+        petRepository.save(pet);
+    }
+
+    // 반려동물 삭제
+    public void delete(Long petId) {
+        petRepository.deleteById(petId);
+    }
+
+
     // 특정 유저의 반려동물 목록 조회
     public List<Pet> getPetsByUser(Long userId) {
         return petRepository.findByUserId(userId);
