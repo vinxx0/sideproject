@@ -91,7 +91,7 @@ public class ScheduleController {
     // 일정 삭제 
     @PostMapping("/{scheduleId}/delete")
     public String delete(@PathVariable Long scheduleId) {
-        Long petId = scheduleService.getSchedule(scheduleId).getpet().getId();
+        Long petId = scheduleService.getSchedule(scheduleId).getPet().getId();
         return "redirect:/schedule/list/" + petId;
     }
 }

@@ -37,6 +37,26 @@ public class ScheduleService {
         scheduleRepository.save(schedule);
     }
 
+    // 일정 단건 조회
+    public Schedule getSchedule(Long scheduleId) {
+        return scheduleRepository.findById(scheduleId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 일정입니다"));
+    }
+
+    // 일정 수정
+    public void update(Long scheduleId, ScheduleDto scheduleDto) {
+        Schedule schedule = scheduleRepository.findById(scheduleId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 일정입니다"));
+        schedule.update(scheduleDto.getTitle(), scheduleDto.getType(),
+                        scheduleDto.getSchLocalDate(), scheduleDto.isRepeating());
+        scheduleRepository.save(schedule);
+    }
+
+    // 일정 삭제
+    public void delete(Long scheduleId) {
+        scheduleRepository.deleteById(scheduleId);
+    }
+
     // 특정 반려동물의 일정 조회
     public List<Schedule> getSchedulesByPet(Long petId) {
         return scheduleRepository.findByPetId(petId);

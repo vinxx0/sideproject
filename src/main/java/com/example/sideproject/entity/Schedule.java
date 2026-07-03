@@ -50,4 +50,11 @@ public class Schedule {
         this.completed = true;
     }
 
+    public void update(String title, ScheduleType type,
+                       LocalDate scheduledDate, boolean isRepeating) {
+        this.title = title;
+        this.type = type;
+        this.scheduledDate = scheduledDate;
+        this.isRepeating = isRepeating;
+    }
 }
