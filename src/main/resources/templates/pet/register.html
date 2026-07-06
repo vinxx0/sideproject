@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{common/header :: head}"></head>
+
+<body>
+<nav th:replace="~{common/header :: header}"></nav>
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-body p-5">
+                    <h4 class="fw-bold text-center mb-4">🐾 반려동물 등록</h4>
+
+                    <form th:action="@{/pet/register}" th:object="${petDto}"
+                          method="post" enctype="multipart/form-data">
+
+                        <!-- 이름 -->
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">이름</label>
+                            <input type="text" class="form-control" th:field="*{name}" placeholder="반려동물 이름을 입력해주세요">
+                            <div class="text-danger small" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
+                        </div>
+
+                        <!-- 종 -->
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">종</label>
+                            <select class="form-select" id="species" th:field="*{species}">
+                                <option value="">종을 선택해주세요</option>
+                                <option value="강아지">강아지</option>
+                                <option value="고양이">고양이</option>
+                                <option value="기타">기타</option>
+                            </select>
+                            <div class="text-danger small" th:if="${#fields.hasErrors('species')}" th:errors="*{species}"></div>
+                        </div>
+
+                        <!-- 품종 -->
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">품종</label>
+                            <select class="form-select" id="breed" th:field="*{breed}">
+                                <option value="">종을 먼저 선택해주세요</option>
+                            </select>
+                        </div>
+
+                        <!-- 성별 -->
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">성별</label>
+                            <div class="d-flex gap-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" th:field="*{gender}" value="MALE" id="male">
+                                    <label class="form-check-label" for="male">수컷</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" th:field="*{gender}" value="FEMALE" id="female">
+                                    <label class="form-check-label" for="female">암컷</label>
+                                </div>
+                            </div>
+                            <div class="text-danger small" th:if="${#fields.hasErrors('gender')}" th:errors="*{gender}"></div>
+                        </div>
+
+                        <!-- 생일 -->
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">생일</label>
+                            <input type="date" class="form-control" th:field="*{birthDate}">
+                            <small class="text-muted">* 정확한 생일을 모르는 경우, 함께하게 된 날짜를 입력해주세요💚</small>
+                        </div>
+
+                        <!-- 프로필 사진 -->
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">프로필 사진</label>
+                            <input type="file" class="form-control" th:field="*{profileImage}" accept="image/*">
+                            <div class="text-danger small" th:if="${#fields.hasErrors('profileImage')}" th:errors="*{profileImage}"></div>
+                        </div>
+
+                        <div class="d-grid mt-4">
+                            <button type="submit" class="btn btn-primary">등록하기</button>
+                        </div>
+
+                        <div class="text-center mt-3">
+                            <a th:href="@{/pet/list}" class="small text-muted">← 목록으로 돌아가기</a>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 종 선택시 품종 자동 변경 JavaScript -->
+<script>
+    const breeds = {
+        '강아지': ['말티즈', '푸들', '골든리트리버', '래브라도 리트리버', '포메라니안',
+                  '치와와', '시바이누', '진돗개', '비숑프리제', '요크셔테리어',
+                  '닥스훈트', '불독', '코커스패니얼', '보더콜리', '웰시코기',
+                  '사모예드', '허스키', '달마시안', '아키타', '믹스견'],
+        '고양이': ['페르시안', '러시안블루', '스코티시폴드', '브리티시숏헤어', '메인쿤',
+                  '벵갈', '샴', '아비시니안', '노르웨이숲', '터키시앙고라',
+                  '먼치킨', '라가머핀', '믹스묘'],
+        '기타': ['토끼', '햄스터', '기니피그', '앵무새', '고슴도치', '페럿', '기타']
+    };
+
+    const speciesSelect = document.getElementById('species');
+    const breedSelect = document.getElementById('breed');
+
+    speciesSelect.addEventListener('change', function () {
+        const selected = this.value;
+        breedSelect.innerHTML = '<option value="">품종을 선택해주세요</option>';
+
+        if (selected && breeds[selected]) {
+            breeds[selected].forEach(breed => {
+                const option = document.createElement('option');
+                option.value = breed;
+                option.textContent = breed;
+                breedSelect.appendChild(option);
+            });
+        }
+    });
+</script>
+
+<footer th:replace="~{common/footer :: footer}"></footer>
+</body>
+</html>

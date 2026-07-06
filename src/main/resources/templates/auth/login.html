@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{common/header :: head}"></head>
+
+<body>
+<nav th:replace="~{common/header :: header}"></nav>
+
+<div class="container">
+    <div class="row justify-content-center align-items-center" style="min-height: 85vh;">
+        <div class="col-md-5">
+            <div class="card shadow-sm">
+                <div class="card-body p-5">
+                    <h3 class="card-title text-center mb-4 fw-bold">🐾 로그인</h3>
+
+                    <form th:action="@{/auth/login}" method="post">
+
+                        <!-- 이메일 -->
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">이메일</label>
+                            <input type="email" class="form-control" name="email" placeholder="이메일을 입력해주세요">
+                        </div>
+
+                        <!-- 비밀번호 -->
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">비밀번호</label>
+                            <input type="password" class="form-control" name="password" placeholder="비밀번호를 입력해주세요">
+                        </div>
+
+                        <!-- 오류 메시지 -->
+                        <div class="text-danger small mb-3" th:if="${error}" th:text="${error}"></div>
+
+                        <div class="d-grid mt-4">
+                            <button type="submit" class="btn btn-primary">로그인</button>
+                        </div>
+
+                        <div class="text-center mt-3">
+                            <span class="text-muted small">아직 계정이 없으신가요?</span>
+                            <a th:href="@{/user/register}" class="small">회원가입</a>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer th:replace="~{common/footer :: footer}"></footer>
+</body>
+</html>

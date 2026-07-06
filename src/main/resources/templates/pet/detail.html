@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{common/header :: head}"></head>
+
+<body>
+<nav th:replace="~{common/header :: header}"></nav>
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+
+                <!-- 프로필 사진 -->
+                <img th:if="${pet.profileImageUrl != null}"
+                     th:src="${pet.profileImageUrl}"
+                     class="card-img-top"
+                     style="height: 280px; object-fit: cover; border-radius: 16px 16px 0 0;">
+                <img th:unless="${pet.profileImageUrl != null}"
+                     src="https://via.placeholder.com/600x280?text=🐾"
+                     class="card-img-top"
+                     style="height: 280px; object-fit: cover; border-radius: 16px 16px 0 0;">
+
+                <div class="card-body p-4">
+                    <h4 class="fw-bold mb-3" th:text="${pet.name}">반려동물 이름</h4>
+
+                    <ul class="list-group list-group-flush mb-4">
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span class="text-muted">종</span>
+                            <span th:text="${pet.species}">종</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between" th:if="${pet.breed != null}">
+                            <span class="text-muted">품종</span>
+                            <span th:text="${pet.breed}">품종</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span class="text-muted">성별</span>
+                            <span th:text="${pet.gender == T(com.example.sideproject.common.Gender).MALE ? '수컷 ♂' : '암컷 ♀'}"></span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between" th:if="${pet.birthDate != null}">
+                            <span class="text-muted">생일</span>
+                            <span th:text="${#temporals.format(pet.birthDate, 'yyyy년 MM월 dd일')}">생일</span>
+                        </li>
+                    </ul>
+
+                    <!-- 돌봄 기록 / 일정 바로가기 -->
+                    <div class="row g-2 mb-4">
+                        <div class="col-6">
+                            <a th:href="@{/carelog/list/{id}(id=${pet.id})}" class="btn btn-outline-secondary w-100">
+                                📋 돌봄 기록
+                            </a>
+                        </div>
+                        <div class="col-6">
+                            <a th:href="@{/schedule/list/{id}(id=${pet.id})}" class="btn btn-outline-secondary w-100">
+                                📅 일정 관리
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- 수정 / 삭제 -->
+                    <div class="d-flex gap-2">
+                        <a th:href="@{/pet/{id}/edit(id=${pet.id})}" class="btn btn-primary w-100">수정</a>
+                        <form th:action="@{/pet/{id}/delete(id=${pet.id})}" method="post" class="w-100"
+                              onsubmit="return confirm('정말 삭제하시겠습니까? 모든 기록이 함께 삭제됩니다.')">
+                            <button type="submit" class="btn btn-outline-danger w-100">삭제</button>
+                        </form>
+                    </div>
+
+                    <div class="text-center mt-3">
+                        <a th:href="@{/pet/list}" class="small text-muted">← 목록으로 돌아가기</a>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer th:replace="~{common/footer :: footer}"></footer>
+</body>
+</html>
