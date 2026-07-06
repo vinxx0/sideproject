@@ -97,8 +97,7 @@
                   '사모예드', '허스키', '달마시안', '아키타', '믹스견'],
         '고양이': ['페르시안', '러시안블루', '스코티시폴드', '브리티시숏헤어', '메인쿤',
                   '벵갈', '샴', '아비시니안', '노르웨이숲', '터키시앙고라',
-                  '먼치킨', '라가머핀', '믹스묘'],
-        '기타': ['토끼', '햄스터', '기니피그', '앵무새', '고슴도치', '페럿', '기타']
+                  '먼치킨', '라가머핀', '믹스묘']
     };
 
     const speciesSelect = document.getElementById('species');
@@ -106,15 +105,40 @@
 
     speciesSelect.addEventListener('change', function () {
         const selected = this.value;
-        breedSelect.innerHTML = '<option value="">품종을 선택해주세요</option>';
 
-        if (selected && breeds[selected]) {
-            breeds[selected].forEach(breed => {
-                const option = document.createElement('option');
-                option.value = breed;
-                option.textContent = breed;
-                breedSelect.appendChild(option);
-            });
+        // 기타 카테고리에 기타를 선택했을 시 반려동물을 직접 입력함
+        if (selected === '기타') {
+            breedSelect.style.display = 'none';
+            breedSelect.name = '';
+
+            let breedInput = document.getElementById('breedInput');
+            if (!breedInput) {
+                breedInput = document.createElement('input');
+                breedInput.type = 'text';
+                breedInput.className = 'form-control';
+                breedInput.id = 'breedInput';
+                breedInput.name = 'breed';
+                breedInput.placeholder = '품종을 직접 입력해주세요';
+                breedSelect.parentNode.appendChild(breedInput);
+            }
+            breedInput.style.display = 'block';
+
+        } else {
+            breedSelect.style.display = 'block';
+            breedSelect.name = 'breed';
+
+            const breedInput = document.getElementById('breedInput');
+            if (breedInput) breedInput.style.display = 'none';
+
+            breedSelect.innerHTML = '<option value="">품종을 선택해주세요</option>';
+            if (selected && breeds[selected]) {
+                breeds[selected].forEach(breed => {
+                    const option = document.createElement('option');
+                    option.value = breed;
+                    option.textContent = breed;
+                    breedSelect.appendChild(option);
+                });
+            }
         }
     });
 </script>
