@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{common/header :: head}">
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet">
+</head>
+
+<body>
+<nav th:replace="~{common/header :: header}"></nav>
+
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4 class="fw-bold">📋 돌봄 기록</h4>
+        <a th:href="@{/carelog/register/{petId}(petId=${petId})}" class="btn btn-primary">+ 기록 추가</a>
+    </div>
+
+    <!-- 캘린더 -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <div id="calendar"></div>
+        </div>
+    </div>
+
+    <!-- 선택한 날짜 기록 목록 -->
+    <div id="careLogList">
+        <h5 class="fw-bold mb-3" id="selectedDate">날짜를 선택해주세요</h5>
+        <div id="careLogItems">
+            <p class="text-muted">캘린더에서 날짜를 클릭하면 해당 날짜의 기록이 표시돼요 🐾</p>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
+<script th:inline="javascript">
+    // Thymeleaf 인라인 javaScript 문법
+    // /*[[${변수명}]]*/ 기본값 형태로 작성
+    // 서버에서 Thymeleaf가 처리할 때 실제 값으로 교체됨
+    // 기본값(0)은 IDE에서 문법 오류 방지용으로만 사용됨 
+    const petId = /*[[${petId}]]*/ 0;
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const calendarEl = document.getElementById('calendar');
+
+        const calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            locale: 'ko',
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: ''
+            },
+            events: `/carelog/api/${petId}`,
+            eventColor: '#4A7C59',
+            dateClick: function (info) {
+                fetchCareLogsByDate(info.dateStr);
+            },
+            eventClick: function (info) {
+                fetchCareLogsByDate(info.event.startStr);
+            }
+        });
+
+        calendar.render();
+    });
+
+    function fetchCareLogsByDate(dateStr) {
+        document.getElementById('selectedDate').textContent = dateStr + ' 기록';
+
+        fetch(`/carelog/api/${petId}`)
+            .then(res => res.json())
+            .then(events => {
+                const filtered = events.filter(e => e.start === dateStr);
+                const container = document.getElementById('careLogItems');
+
+                if (filtered.length === 0) {
+                    container.innerHTML = '<p class="text-muted">이 날짜에 기록이 없어요 🐾</p>';
+                    return;
+                }
+
+                container.innerHTML = filtered.map(e => `
+                    <div class="card shadow-sm mb-2">
+                        <div class="card-body d-flex justify-content-between align-items-center">
+                            <span class="fw-semibold">${e.title}</span>
+                            <div class="d-flex gap-2">
+                                <a href="/carelog/${e.id}/edit" class="btn btn-outline-secondary btn-sm">수정</a>
+                                <form action="/carelog/${e.id}/delete" method="post"
+                                      onsubmit="return confirm('정말 삭제하시겠습니까?')">
+                                    <button type="submit" class="btn btn-outline-danger btn-sm">삭제</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            });
+    }
+</script>
+
+<footer th:replace="~{common/footer :: footer}"></footer>
+</body>
+</html>

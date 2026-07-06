@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{common/header :: head}"></head>
+
+<body>
+<nav th:replace="~{common/header :: header}"></nav>
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-body p-5">
+                    <h4 class="fw-bold text-center mb-4">📋 돌봄 기록 수정</h4>
+
+                    <form th:action="@{/carelog/{id}/edit(id=${careLog.id})}"
+                          method="post" enctype="multipart/form-data">
+
+                        <!-- 기록 유형 -->
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">기록 유형</label>
+                            <div class="d-flex gap-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="type" value="WALK" id="walk"
+                                           th:checked="${careLog.type.name() == 'WALK'}">
+                                    <label class="form-check-label" for="walk">🦮 산책</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="type" value="FEED" id="feed"
+                                           th:checked="${careLog.type.name() == 'FEED'}">
+                                    <label class="form-check-label" for="feed">🍚 급식</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="type" value="POOP" id="poop"
+                                           th:checked="${careLog.type.name() == 'POOP'}">
+                                    <label class="form-check-label" for="poop">💩 배변</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 날짜 -->
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">날짜</label>
+                            <input type="date" class="form-control" name="date"
+                                   th:value="${careLog.date}">
+                        </div>
+
+                        <!-- 시간 -->
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">시간</label>
+                            <input type="time" class="form-control" name="time"
+                                   th:value="${careLog.time}">
+                        </div>
+
+                        <!-- 메모 -->
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">메모</label>
+                            <textarea class="form-control" name="memo" rows="3"
+                                      th:text="${careLog.memo}"></textarea>
+                        </div>
+
+                        <!-- 기존 사진 -->
+                        <div class="mb-3" th:if="${careLog.imageUrl != null}">
+                            <label class="form-label fw-semibold">기존 사진</label>
+                            <div class="d-flex gap-2 flex-wrap">
+                                <img th:each="url : ${#strings.arraySplit(careLog.imageUrl, ',')}"
+                                     th:src="${url}"
+                                     class="rounded"
+                                     style="height: 80px; width: 80px; object-fit: cover;">
+                            </div>
+                        </div>
+
+                        <!-- 새 사진 첨부 -->
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">새 사진 첨부</label>
+                            <input type="file" class="form-control" name="images"
+                                   accept="image/*" multiple>
+                            <small class="text-muted">* 새 사진을 올리면 기존 사진이 교체돼요. 최대 5장, 장당 10MB 이하</small>
+                        </div>
+
+                        <div class="d-grid mt-4">
+                            <button type="submit" class="btn btn-primary">수정 완료</button>
+                        </div>
+
+                        <div class="text-center mt-3">
+                            <a th:href="@{/carelog/list/{petId}(petId=${careLog.pet.id})}" class="small text-muted">← 목록으로 돌아가기</a>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer th:replace="~{common/footer :: footer}"></footer>
+</body>
+</html>
