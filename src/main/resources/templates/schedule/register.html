@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{common/header :: head}"></head>
+
+<body>
+<nav th:replace="~{common/header :: header}"></nav>
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-body p-5">
+                    <h4 class="fw-bold text-center mb-4">📅 일정 등록</h4>
+
+                    <form th:action="@{/schedule/register/{petId}(petId=${petId})}"
+                          th:object="${scheduleDto}"
+                          method="post">
+
+                        <!-- 제목 -->
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">제목 *</label>
+                            <input type="text" class="form-control" th:field="*{title}"
+                                   placeholder="일정 제목을 입력해주세요">
+                            <div class="text-danger small" th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></div>
+                        </div>
+
+                        <!-- 일정 유형 -->
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">유형 *</label>
+                            <select class="form-select" th:field="*{type}">
+                                <option value="">유형을 선택해주세요</option>
+                                <option th:each="type : ${scheduleTypes}"
+                                        th:value="${type}"
+                                        th:text="${type == T(com.example.sideproject.common.ScheduleType).VACCINE ? '💉 예방접종' :
+                                                   type == T(com.example.sideproject.common.ScheduleType).CHECKUP ? '🏥 검진' : '📌 기타'}">
+                                </option>
+                            </select>
+                            <div class="text-danger small" th:if="${#fields.hasErrors('type')}" th:errors="*{type}"></div>
+                        </div>
+
+                        <!-- 날짜 -->
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">날짜 *</label>
+                            <input type="date" class="form-control" th:field="*{scheduledDate}">
+                            <div class="text-danger small" th:if="${#fields.hasErrors('scheduledDate')}" th:errors="*{scheduledDate}"></div>
+                        </div>
+
+                        <!-- 반복 여부 -->
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" th:field="*{isRepeating}" id="isRepeating">
+                                <label class="form-check-label" for="isRepeating">
+                                    매년 반복 (예: 매년 같은 날 예방접종)
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="d-grid mt-4">
+                            <button type="submit" class="btn btn-primary">등록하기</button>
+                        </div>
+
+                        <div class="text-center mt-3">
+                            <a th:href="@{/schedule/list/{petId}(petId=${petId})}" class="small text-muted">← 목록으로 돌아가기</a>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer th:replace="~{common/footer :: footer}"></footer>
+</body>
+</html>
