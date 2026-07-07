@@ -49,6 +49,8 @@ public class Pet {
     private LocalDate birthDate;
     private String profileImageUrl;
 
+    private String description; // 한 줄 소개
+
     @Builder.Default
     @OneToMany(
         mappedBy = "pet",
@@ -65,17 +67,20 @@ public class Pet {
         cascade = CascadeType.ALL,
         orphanRemoval = true
     )
+
     private List<Schedule> schedules = new ArrayList<>();
 
     public void update(String name, String species, Gender gender,
-                       String breed, LocalDate birthDate, String profileImageUrl) {
+                       String breed, LocalDate birthDate, String profileImageUrl, String description) {
         this.name = name;
         this.species = species;
         this.gender = gender;
         this.breed = breed;
         this.birthDate = birthDate;
         this.profileImageUrl = profileImageUrl;
+        this.description = description;
     }
+    
 }
 
 

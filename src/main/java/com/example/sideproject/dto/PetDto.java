@@ -29,4 +29,6 @@ public class PetDto {
 
     @NotNull(message = "프로필 사진을 등록해주세요")
     private MultipartFile profileImage; 
+
+    private String description; // 한 줄 소개
 }

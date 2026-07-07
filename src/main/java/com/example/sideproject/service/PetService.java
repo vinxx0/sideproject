@@ -41,6 +41,7 @@ public class PetService {
                 .breed(petDto.getBreed())
                 .birthDate(petDto.getBirthDate())
                 .profileImageUrl(profileImageUrl)
+                .description(petDto.getDescription()) // ← 추가!
                 .build();
 
         petRepository.save(pet);
@@ -56,7 +57,8 @@ public class PetService {
                 : pet.getProfileImageUrl();
         
         pet.update(petDto.getName(), petDto.getSpecies(), petDto.getGender(),
-                   petDto.getBreed(), petDto.getBirthDate(), profileImageUrl);
+                   petDto.getBreed(), petDto.getBirthDate(), profileImageUrl,
+                   petDto.getDescription()); // ← 추가!
         petRepository.save(pet);
     }
 
