@@ -25,7 +25,7 @@ public class CareLogService {
     private final CareLogRepository careLogRepository;
     private final PetRepository petRepository;
 
-    private final String uploadDir = "C:/upload/carelogs/";
+   private final String uploadDir = System.getProperty("user.home") + "/upload/carelogs/";
     private static final int MAX_IMAGE_COUNT = 5; // 사진 최대 5장
     private static final long MAX_FILE_SIZE = 10 * 1024 * 1024; // 장당 10MB
 

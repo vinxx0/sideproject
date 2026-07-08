@@ -25,7 +25,7 @@ public class PetService {
     private final UserRepository userRepository;
 
     // 업로드 경로는 나중에 application.properties 값 주입받아서 사용 
-    private final String uploadDir = "C:/upload/pets/";
+    private final String uploadDir = System.getProperty("user.home") + "/upload/pets/";
 
     // 반려동물 등록
     public void register(PetDto petDto, Long userId) {
