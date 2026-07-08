@@ -30,7 +30,7 @@ public class ScheduleService {
                 .title(scheduleDto.getTitle())
                 .type(scheduleDto.getType())
                 .scheduledDate(scheduleDto.getSchLocalDate())
-                .isRepeating(scheduleDto.isRepeating())
+                .repeating(scheduleDto.repeating())
                 .completed(false)
                 .build();
         
@@ -48,7 +48,7 @@ public class ScheduleService {
         Schedule schedule = scheduleRepository.findById(scheduleId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 일정입니다"));
         schedule.update(scheduleDto.getTitle(), scheduleDto.getType(),
-                        scheduleDto.getSchLocalDate(), scheduleDto.isRepeating());
+                        scheduleDto.getSchLocalDate(), scheduleDto.repeating());
         scheduleRepository.save(schedule);
     }
 

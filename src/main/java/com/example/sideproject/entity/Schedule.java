@@ -43,7 +43,7 @@ public class Schedule {
     @Column(nullable = false)
     private LocalDate scheduledDate;
     @ColumnDefault("false")
-    private boolean isRepeating;
+    private boolean repeating;
     @ColumnDefault("false")
     private boolean completed;
     public void complete() {
@@ -51,10 +51,10 @@ public class Schedule {
     }
 
     public void update(String title, ScheduleType type,
-                       LocalDate scheduledDate, boolean isRepeating) {
+                       LocalDate scheduledDate, boolean repeating) {
         this.title = title;
         this.type = type;
         this.scheduledDate = scheduledDate;
-        this.isRepeating = isRepeating;
+        this.repeating = repeating;
     }
 }

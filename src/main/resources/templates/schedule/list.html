@@ -59,7 +59,7 @@
                     <span class="text-muted small ms-2"
                           th:text="${#temporals.format(schedule.scheduledDate, 'yyyy.MM.dd')}">
                     </span>
-                    <span th:if="${schedule.isRepeating}"
+                    <span th:if="${schedule.repeating}"
                           class="text-muted small ms-1">🔁 매년 반복</span>
                 </div>
 
