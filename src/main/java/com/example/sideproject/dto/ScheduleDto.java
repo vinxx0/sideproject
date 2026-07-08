@@ -22,5 +22,5 @@ public class ScheduleDto {
     @NotNull(message = "날짜를 입력해주세요")
     private LocalDate schLocalDate;
 
-    private boolean isRepeating;
+    private boolean repeating; // 변경
 }
