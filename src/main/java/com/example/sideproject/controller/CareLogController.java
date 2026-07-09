@@ -1,6 +1,9 @@
 package com.example.sideproject.controller;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -10,6 +13,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.example.sideproject.common.CareType;
 import com.example.sideproject.dto.CareLogDto;
@@ -60,11 +64,12 @@ public class CareLogController {
             return "carelog/register";
         }
 
-        return "redirect:/carelog/list" + petId;
+       return "redirect:/carelog/list/" + petId;
+
     }
 
     // 돌봄 기록 수정 페이지
-    @GetMapping("/{carelogId}/edit")
+    @GetMapping("/{careLogId}/edit")
     public String editForm(@PathVariable Long careLogId, Model model) {
         CareLog careLog = careLogService.getCareLog(careLogId);
         model.addAttribute("careLog", careLog);
@@ -78,7 +83,7 @@ public class CareLogController {
                        @Valid @ModelAttribute CareLogDto careLogDto,
                        BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            return "careog/edit";
+            return "carelog/edit";
         }
 
         careLogService.update(careLogId, careLogDto);
@@ -92,6 +97,31 @@ public class CareLogController {
         careLogService.delete(careLogId);
         return "redirect:/carelog/list/" + petId;
     }
+
+    // 캘린더용 데이어 API
+    @GetMapping("/api/{petId}")
+    @ResponseBody
+    public List<Map<String, Object>> getCareLogsForCalendar(@PathVariable Long petId) {
+    List<CareLog> careLogs = careLogService.getCareLogsByPet(petId);
+    List<Map<String, Object>> events = new ArrayList<>();
+
+    for (CareLog careLog : careLogs) {
+        Map<String, Object> event = new HashMap<>();
+        String emoji = switch (careLog.getType()) {
+            case WALK -> "🦮 산책";
+            case FEED -> "🍚 급식";
+            case POOP -> "💩 배변";
+        };
+        event.put("title", emoji);
+        event.put("start", careLog.getDate().toString());
+        event.put("id", careLog.getId());
+        event.put("time", careLog.getTime() != null ? careLog.getTime().toString() : null);
+        event.put("memo", careLog.getMemo());
+        event.put("imageUrl", careLog.getImageUrl());
+        events.add(event);
+    }
+    return events;
+}
 
 }
 
