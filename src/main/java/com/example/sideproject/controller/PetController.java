@@ -10,9 +10,11 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 
 import com.example.sideproject.dto.PetDto;
 import com.example.sideproject.entity.Pet;
+import com.example.sideproject.security.UserDetailsImpl;
 import com.example.sideproject.service.PetService;
 
 import jakarta.validation.Valid;
@@ -22,18 +24,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @RequestMapping("/pet")
 public class PetController {
-    
-    private final PetService petService;
 
-    // 반려동물 목록 페이지
-    @GetMapping("/list")
-    public String list(Model model) {
-        // 보안에서 로그인한 유저의 id 가져올 예정
-        Long userId = 1L; // 임시 유저 아이디
-        List<Pet> pets = petService.getPetsByUser(userId);
-        model.addAttribute("pets", pets);
-        return "/pet/list";
-    }
+    private final PetService petService;
 
     // 반려동물 등록 페이지
     @GetMapping("/register")
@@ -45,17 +37,27 @@ public class PetController {
     // 반려동물 등록 처리
     @PostMapping("/register")
     public String register(@Valid @ModelAttribute PetDto petDto,
-                            BindingResult bindingResult) {
-        if (bindingResult.hasErrors()){
+            BindingResult bindingResult,
+            @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        if (bindingResult.hasErrors()) {
             return "pet/register";
         }
 
-        Long userId = 1L; // 임시 유저아이디
+        Long userId = userDetails.getUser().getId();
         petService.register(petDto, userId);
         return "redirect:/pet/list";
     }
 
-    // 반려동물 상세 페이지
+    // 반려동물 목록 페이지
+    @GetMapping("/list")
+    public String list(Model model, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        Long userId = userDetails.getUser().getId();
+        List<Pet> pets = petService.getPetsByUser(userId);
+        model.addAttribute("pets", pets);
+        return "pet/list";
+    }
+
+     // 반려동물 상세 페이지
     @GetMapping("/{petId}")
     public String detail(@PathVariable Long petId, Model model) {
         Pet pet = petService.getPet(petId);
@@ -73,9 +75,9 @@ public class PetController {
 
     // 반려동물 수정 처리
     @PostMapping("/{petId}/edit")
-    public String edit(@PathVariable Long petId, 
-                       @Valid @ModelAttribute PetDto petDto,
-                       BindingResult bindingResult) {
+    public String edit(@PathVariable Long petId,
+            @Valid @ModelAttribute PetDto petDto,
+            BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             return "pet/edit";
         }

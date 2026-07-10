@@ -6,12 +6,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
 import com.example.sideproject.entity.Pet;
 import com.example.sideproject.entity.Schedule;
+import com.example.sideproject.security.UserDetailsImpl;
 import com.example.sideproject.service.PetService;
 import com.example.sideproject.service.ScheduleService;
 
@@ -24,9 +26,10 @@ public class IndexController {
     private final PetService petService;
     private final ScheduleService scheduleService;
 
-   @GetMapping("/")
-    public String index(Model model) {
-    Long userId = 1L;
+  @GetMapping("/")
+public String index(Model model, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+    Long userId = userDetails.getUser().getId();
+
     List<Pet> pets = petService.getPetsByUser(userId);
     model.addAttribute("pets", pets);
 
@@ -36,7 +39,6 @@ public class IndexController {
     }
     model.addAttribute("upcomingSchedules", upcomingSchedules);
 
-    // D-day 계산해서 Map으로 넘겨줘요
     Map<Long, Long> dDayMap = new HashMap<>();
     for (Schedule schedule : upcomingSchedules) {
         long dDay = java.time.temporal.ChronoUnit.DAYS.between(
