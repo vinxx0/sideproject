@@ -32,11 +32,11 @@
 
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
 <script th:inline="javascript">
+    const petId = /*[[${petId}]]*/ 0;
     // Thymeleaf 인라인 javaScript 문법
     // /*[[${변수명}]]*/ 기본값 형태로 작성
     // 서버에서 Thymeleaf가 처리할 때 실제 값으로 교체됨
     // 기본값(0)은 IDE에서 문법 오류 방지용으로만 사용됨 
-    const petId = /*[[${petId}]]*/ 0;
 
     document.addEventListener('DOMContentLoaded', function () {
         const calendarEl = document.getElementById('calendar');
@@ -49,7 +49,7 @@
                 center: 'title',
                 right: ''
             },
-            events: `/carelog/api/${petId}`,
+            events: '/carelog/api/' + petId,
             eventColor: '#4A7C59',
             dateClick: function (info) {
                 fetchCareLogsByDate(info.dateStr);
@@ -63,49 +63,54 @@
     });
 
     function fetchCareLogsByDate(dateStr) {
-    document.getElementById('selectedDate').textContent = dateStr + ' 기록';
+        document.getElementById('selectedDate').textContent = dateStr + ' 기록';
 
-    // 선택된 날짜 표시 (2번 문제도 같이 해결!)
-    document.querySelectorAll('.fc-day').forEach(day => {
-        day.style.backgroundColor = '';
-    });
-    const selectedDay = document.querySelector(`[data-date="${dateStr}"]`);
-    if (selectedDay) {
-        selectedDay.style.backgroundColor = '#d4e6d9';
-    }
-
-    fetch(`/carelog/api/${petId}`)
-        .then(res => res.json())
-        .then(events => {
-            const filtered = events.filter(e => e.start === dateStr);
-            const container = document.getElementById('careLogItems');
-
-            if (filtered.length === 0) {
-                container.innerHTML = '<p class="text-muted">이 날짜에 기록이 없어요 🐾</p>';
-                return;
-            }
-
-            container.innerHTML = filtered.map(e => `
-                <div class="card shadow-sm mb-3">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <h5 class="fw-bold mb-0">${e.title}</h5>
-                            <div class="d-flex gap-2">
-                                <a href="/carelog/${e.id}/edit" class="btn btn-outline-secondary btn-sm">수정</a>
-                                <form action="/carelog/${e.id}/delete" method="post"
-                                      onsubmit="return confirm('정말 삭제하시겠습니까?')">
-                                    <button type="submit" class="btn btn-outline-danger btn-sm">삭제</button>
-                                </form>
-                            </div>
-                        </div>
-                        <p class="text-muted small mb-1">🕐 시간: ${e.time || '미입력'}</p>
-                        <p class="text-muted small mb-0">📝 메모: ${e.memo || '없음'}</p>
-                        ${e.imageUrl ? `<img src="${e.imageUrl}" class="mt-2 rounded" style="height: 100px; object-fit: cover;">` : ''}
-                    </div>
-                </div>
-            `).join('');
+        document.querySelectorAll('.fc-day').forEach(function(day) {
+            day.style.backgroundColor = '';
         });
-}
+        var selectedDay = document.querySelector('[data-date="' + dateStr + '"]');
+        if (selectedDay) {
+            selectedDay.style.backgroundColor = '#d4e6d9';
+        }
+
+        fetch('/carelog/api/' + petId)
+            .then(function(res) { return res.json(); })
+            .then(function(events) {
+                var filtered = events.filter(function(e) { return e.start === dateStr; });
+                var container = document.getElementById('careLogItems');
+
+                if (filtered.length === 0) {
+                    container.innerHTML = '<p class="text-muted">이 날짜에 기록이 없어요 🐾</p>';
+                    return;
+                }
+
+                var html = '';
+                filtered.forEach(function(e) {
+                    var imageHtml = '';
+                    if (e.imageUrl) {
+                        e.imageUrl.split(',').forEach(function(url) {
+                            imageHtml += '<img src="' + encodeURI(url.trim()) + '" class="mt-2 rounded me-1" style="height: 100px; object-fit: cover;">';
+                        });
+                    }
+
+                    html += '<div class="card shadow-sm mb-3">';
+                    html += '<div class="card-body">';
+                    html += '<div class="d-flex justify-content-between align-items-center mb-2">';
+                    html += '<h5 class="fw-bold mb-0">' + e.title + '</h5>';
+                    html += '<div class="d-flex gap-2">';
+                    html += '<a href="/carelog/' + e.id + '/edit" class="btn btn-outline-secondary btn-sm">수정</a>';
+                    html += '<form action="/carelog/' + e.id + '/delete" method="post" onsubmit="return confirm(\'정말 삭제하시겠습니까?\')">';
+                    html += '<button type="submit" class="btn btn-outline-danger btn-sm">삭제</button>';
+                    html += '</form></div></div>';
+                    html += '<p class="text-muted small mb-1">🕐 시간: ' + (e.time || '미입력') + '</p>';
+                    html += '<p class="text-muted small mb-0">📝 메모: ' + (e.memo || '없음') + '</p>';
+                    html += imageHtml;
+                    html += '</div></div>';
+                });
+
+                container.innerHTML = html;
+            });
+    }
 </script>
 
 <footer th:replace="~{common/footer :: footer}"></footer>
