@@ -28,7 +28,7 @@
                     </div>
                     <span class="badge"
                           style="background-color: #4A7C59;"
-                          th:text="'D-' + ${#temporals.daysBetween(#temporals.createNow(), schedule.scheduledDate)}">
+                          th:text="'D-' + ${dDayMap[schedule.id]}">
                     </span>
                 </div>
             </div>
@@ -83,6 +83,7 @@
     </div>
 </div>
 
+<div style="min-height: 30vh;"></div>
 <footer th:replace="~{common/footer :: footer}"></footer>
 </body>
 </html>
