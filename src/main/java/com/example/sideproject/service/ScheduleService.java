@@ -16,7 +16,7 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class ScheduleService {
-    
+
     private final ScheduleRepository scheduleRepository;
     private final PetRepository petRepository;
 
@@ -33,7 +33,7 @@ public class ScheduleService {
                 .repeating(scheduleDto.isRepeating())
                 .completed(false)
                 .build();
-        
+
         scheduleRepository.save(schedule);
     }
 
@@ -48,7 +48,7 @@ public class ScheduleService {
         Schedule schedule = scheduleRepository.findById(scheduleId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 일정입니다"));
         schedule.update(scheduleDto.getTitle(), scheduleDto.getType(),
-                        scheduleDto.getSchLocalDate(), scheduleDto.isRepeating());
+                scheduleDto.getSchLocalDate(), scheduleDto.isRepeating());
         scheduleRepository.save(schedule);
     }
 
@@ -69,13 +69,27 @@ public class ScheduleService {
 
         schedule.complete();
         scheduleRepository.save(schedule);
+
+        // 매년 반복 일정이면 다음 해 같은 날짜로 새 일정 자동 생성
+        if (schedule.isRepeating()) {
+            Schedule nextSchedule = Schedule.builder()
+                    .pet(schedule.getPet())
+                    .title(schedule.getTitle())
+                    .type(schedule.getType())
+                    .scheduledDate(schedule.getScheduledDate().plusYears(1))
+                    .repeating(true)
+                    .completed(false)
+                    .build();
+            scheduleRepository.save(nextSchedule);
+        }
+
     }
 
-   // 다가오는 일정 조회 (D-day용, 오늘 이후 30일 이내)
+    // 다가오는 일정 조회 (D-day용, 오늘 이후 30일 이내)
     public List<Schedule> getUpcomingSchedules(Long petId) {
         LocalDate today = LocalDate.now();
         LocalDate thirtyDaysLater = today.plusDays(30);
         return scheduleRepository
-                .findByPetIdAndScheduledDateBetween(petId, today, thirtyDaysLater);
+        .findByPetIdAndScheduledDateBetweenAndCompletedFalse(petId, today, thirtyDaysLater);
     }
 }

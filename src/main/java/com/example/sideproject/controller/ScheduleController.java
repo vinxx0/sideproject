@@ -1,6 +1,9 @@
 package com.example.sideproject.controller;
 
+import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -29,13 +32,23 @@ public class ScheduleController {
     // 일정 목록 페이지
     @GetMapping("/list/{petId}")
     public String list(@PathVariable Long petId, Model model) {
-        List<Schedule> schedules = scheduleService.getSchedulesByPet(petId);
-        List<Schedule> upcoming = scheduleService.getUpcomingSchedules(petId);
-        model.addAttribute("schedules", schedules);
-        model.addAttribute("upcoming", upcoming);
-        model.addAttribute("petId", petId);
-        return "schedule/list"; 
+    List<Schedule> schedules = scheduleService.getSchedulesByPet(petId);
+    List<Schedule> upcoming = scheduleService.getUpcomingSchedules(petId);
+    
+    // D-day 계산
+    Map<Long, Long> dDayMap = new HashMap<>();
+    for (Schedule schedule : upcoming) {
+        long dDay = java.time.temporal.ChronoUnit.DAYS.between(
+            LocalDate.now(), schedule.getScheduledDate());
+        dDayMap.put(schedule.getId(), dDay);
     }
+    
+    model.addAttribute("schedules", schedules);
+    model.addAttribute("upcoming", upcoming);
+    model.addAttribute("dDayMap", dDayMap);
+    model.addAttribute("petId", petId);
+    return "schedule/list";
+}
 
     // 일정 등록 페이지
     @GetMapping("/register/{petId}")
@@ -46,17 +59,20 @@ public class ScheduleController {
         return "schedule/register";
     }
 
-    // 일정 등록 처리
+   // 일정 등록 처리
     @PostMapping("/register/{petId}")
     public String register(@PathVariable Long petId,
-                           @Valid @ModelAttribute ScheduleDto scheduleDto,
-                           BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            return "schedule/register";
-        }
+                        @Valid @ModelAttribute ScheduleDto scheduleDto,
+                        BindingResult bindingResult,
+                        Model model) {
+    if (bindingResult.hasErrors()) {
+        model.addAttribute("scheduleTypes", ScheduleType.values());
+        model.addAttribute("petId", petId);
+        return "schedule/register";
+    }
         scheduleService.register(scheduleDto, petId);
         return "redirect:/schedule/list/" + petId;
-    }
+}
 
     // 일정 수정 페이지
      @GetMapping("/{scheduleId}/edit")
@@ -92,6 +108,7 @@ public class ScheduleController {
     @PostMapping("/{scheduleId}/delete")
     public String delete(@PathVariable Long scheduleId) {
         Long petId = scheduleService.getSchedule(scheduleId).getPet().getId();
+        scheduleService.delete(scheduleId); // 빠진 코드 추가
         return "redirect:/schedule/list/" + petId;
     }
 }

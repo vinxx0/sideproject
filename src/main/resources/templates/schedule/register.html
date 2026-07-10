@@ -42,8 +42,8 @@
                         <!-- 날짜 -->
                         <div class="mb-3">
                             <label class="form-label fw-semibold">날짜 *</label>
-                            <input type="date" class="form-control" th:field="*{scheduledDate}">
-                            <div class="text-danger small" th:if="${#fields.hasErrors('scheduledDate')}" th:errors="*{scheduledDate}"></div>
+                            <input type="date" class="form-control" th:field="*{schLocalDate}">
+                           <div class="text-danger small" th:if="${#fields.hasErrors('schLocalDate')}" th:errors="*{schLocalDate}"></div>
                         </div>
 
                         <!-- 반복 여부 -->

@@ -11,6 +11,6 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
     // 특정 반려동물의 일정 조회
     List<Schedule> findByPetId(Long petId);
 
-    List<Schedule> findByPetIdAndScheduledDateBetween(
-            Long petId, LocalDate start, LocalDate end);
+    List<Schedule> findByPetIdAndScheduledDateBetweenAndCompletedFalse(
+    Long petId, LocalDate start, LocalDate end);
 }
