@@ -1,7 +1,10 @@
 package com.example.sideproject.controller;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -21,23 +24,29 @@ public class IndexController {
     private final PetService petService;
     private final ScheduleService scheduleService;
 
-    @GetMapping("/")
+   @GetMapping("/")
     public String index(Model model) {
-        // TODO: Security 붙이면 로그인한 유저 id로 교체
-        Long userId = 1L;
+    Long userId = 1L;
+    List<Pet> pets = petService.getPetsByUser(userId);
+    model.addAttribute("pets", pets);
 
-        List<Pet> pets = petService.getPetsByUser(userId);
-        model.addAttribute("pets", pets);
-
-        // 다가오는 일정 전체 (모든 반려동물)
-        List<Schedule> upcomingSchedules = new ArrayList<>();
-        for (Pet pet : pets) {
-            upcomingSchedules.addAll(scheduleService.getUpcomingSchedules(pet.getId()));
-        }
-        model.addAttribute("upcomingSchedules", upcomingSchedules);
-
-        return "index";
+    List<Schedule> upcomingSchedules = new ArrayList<>();
+    for (Pet pet : pets) {
+        upcomingSchedules.addAll(scheduleService.getUpcomingSchedules(pet.getId()));
     }
+    model.addAttribute("upcomingSchedules", upcomingSchedules);
+
+    // D-day 계산해서 Map으로 넘겨줘요
+    Map<Long, Long> dDayMap = new HashMap<>();
+    for (Schedule schedule : upcomingSchedules) {
+        long dDay = java.time.temporal.ChronoUnit.DAYS.between(
+            LocalDate.now(), schedule.getScheduledDate());
+        dDayMap.put(schedule.getId(), dDay);
+    }
+    model.addAttribute("dDayMap", dDayMap);
+
+    return "index";
+}
     
     
 }
